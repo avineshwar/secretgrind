@@ -26,7 +26,7 @@ Installation:
 		[me@machine ~/valgrind-3.10.1] git clone https://github.com/lmrs2/secretgrind.git
 		[me@machine ~/valgrind-3.10.1] cd secretgrind 
 
-3. Download Capstone
+3. Download [Capstone](http://www.capstone-engine.org/)
 
 		[me@machine ~/valgrind-3.10.1/secretgrind] wget https://github.com/aquynh/capstone/archive/3.0.4.tar.gz -O capstone-3.0.4.tar.gz
 		[me@machine ~/valgrind-3.10.1/secretgrind] tar zxvf capstone-3.0.4.tar.gz
