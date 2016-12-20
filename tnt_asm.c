@@ -9,7 +9,7 @@
  * it internally at compilation time, see coregrind/m_machine.c
  * 
  * So I copy their macros here and set the correct architecture, 
- * then use capstone to disassemble [0]. AN example can be found at [1].
+ * then use capstone to disassemble [0]. An example can be found at [1].
  * 
  * For installation, see [2]. It may vary depending on your platform.
  * Headers should be installed under <YOUR_INCLUDE>/capstone/
