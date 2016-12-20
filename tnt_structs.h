@@ -62,10 +62,14 @@ struct myStringArray{
 };
 
 Int myStringArray_getIndex(struct myStringArray *a, HChar* string){
-   int i;
+   unsigned i;
 
    for( i = 0; i < a->size; i++ ){
+	  #if _SECRETGRIND_
+	  if( VG_(strcmp(string, a->m[i])) == 0 ) 
+	  #else
       if( VG_(strstr)(a->m[i], string) != NULL && VG_(strstr)(string, a->m[i]) != NULL )
+      #endif // _SECRETGRIND_
          return i;
    }
    //msg( "get_index: string %s not found\n", string );

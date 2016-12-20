@@ -1,0 +1,55 @@
+Requirements:
+	1- Python must be installed on your machine for the installation process to complete
+	2- Please follow the instruction *in order*. You will get an error if you don't.
+	3- If you get an error during compilation or while using the tool, please tell us.
+
+Download Valgrind
+
+	[me@machine ~/] wget valgrind.org/downloads/valgrind-3.10.1.tar.bz2
+	[me@machine ~/] diff <(sha256sum -b valgrind-3.10.1.tar.bz2) <(echo 'fa253dc26ddb661b6269df58144eff607ea3f76a9bcfe574b0c7726e1dfcb997 *valgrind-3.10.1.tar.bz2')
+                    An empty results means files are identical
+	[me@machine ~/] tar jxvf valgrind-3.10.1.tar.bz2
+	[me@machine ~/] cd valgrind-3.10.1
+
+Git clone Secretgrind
+
+	[me@machine ~/valgrind-3.10.1] wget https://www.cl.cam.ac.uk/~lmrs2/secretgrind.zip
+	[me@machine ~/valgrind-3.10.1] 7z x secretgrind.zip
+	[me@machine ~/valgrind-3.10.1] cd secretgrind 
+
+Download Capstone
+
+	[me@machine ~/valgrind-3.10.1/secretgrind] wget https://github.com/aquynh/capstone/archive/3.0.4.tar.gz -O capstone-3.0.4.tar.gz
+	[me@machine ~/valgrind-3.10.1/secretgrind] tar zxvf capstone-3.0.4.tar.gz
+
+Configure and build Valgrind
+
+	[me@machine ~/valgrind-3.10.1/secretgrind] sh configure_valgrind.sh
+	[me@machine ~/valgrind-3.10.1] cd ..
+	[me@machine ~/valgrind-3.10.1] ./autogen.sh
+	[me@machine ~/valgrind-3.10.1] ./configure --prefix=`pwd`/inst 							
+	[me@machine ~/valgrind-3.10.1] make && make install
+
+
+Configure and build Capstone
+
+	[me@machine ~/valgrind-3.10.1] cd secretgrind
+	[me@machine ~/valgrind-3.10.1/secretgrind] sh configure_capstone.sh `pwd`/../inst		// Note: obviously this should be the same as the one used to configure Valgrind!
+	[me@machine ~/valgrind-3.10.1/secretgrind] cd capstone-3.0.4
+	[me@machine ~/valgrind-3.10.1/secretgrind/capstone-3.0.4] sh make_capstone.sh
+
+Configure and build Taintgrind
+
+	[me@machine ~/valgrind-3.10.1/secretgrind/capstone-3.0.4] cd ../
+	[me@machine ~/valgrind-3.10.1/secretgrind] ../autogen.sh
+	[me@machine ~/valgrind-3.10.1/secretgrind] ./configure --prefix=`pwd`/../inst			// Note: obviously this should be the same as the one used to configure Valgrind and Capstone!
+	[me@machine ~/valgrind-3.10.1/secretgrind] make && make install
+
+
+Run it
+	[me@machine ~/wherever/] alias secretgrind=~/valgrind-3.10.1/inst/bin/valgrind --tool=secretgrind
+	[me@machine ~/wherever/] secretgrind --help
+	[me@machine ~/wherever/] secretgrind --file-filter=taintedfile.txt ./program_that_reads_tainted_file
+
+Secretgrind is built on top of Taingrind https://github.com/wmkhoo/secretgrind/
+

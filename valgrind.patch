@@ -1,0 +1,17 @@
+--- m_execontext.c	2016-02-17 14:31:28.757895822 +0000
++++ m_execontext.c.patch	2016-02-17 14:32:44.638673661 +0000
+@@ -201,6 +201,14 @@
+    VG_(pp_StackTrace)( ec->ips, ec->n_ips );
+ }
+ 
++// Taintgrind support auto-generated through sh configure_valgrind.sh. Do not change!!
++void VG_(apply_ExeContext)( void(*action)(UInt n, Addr ip),
++                           ExeContext* ec, UInt n_ips ) 
++{
++   VG_(apply_StackTrace)(action, NULL, ec->ips, 
++                         n_ips < ec->n_ips ? n_ips : ec->n_ips);
++}
++
+ 
+ /* Compare two ExeContexts.  Number of callers considered depends on res. */
+ Bool VG_(eq_ExeContext) ( VgRes res, ExeContext* e1, ExeContext* e2 )
