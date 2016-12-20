@@ -111,6 +111,7 @@ TODO: examples
 TODO: a note a untrusted sw
 TODO: vg_replace_malloc.c:296
 TODO: link to presentation
+TODO: example using the API
 
 The output of Secretgrind can be *huge*. You might consider piping the output to gzip.
 
