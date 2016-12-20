@@ -1,11 +1,7 @@
-Taintgrind: a Valgrind taint analysis tool
-==========================================
+Secretgrind: a Valgrind analysis tool to detect secrets in memory
+=================================================================
 
-
-2013-11-18 Currently supporting: Valgrind 3.9.0, x86\_linux and amd64\_linux
-
-
-This text is available in [Czech](http://czlib.bizcow.com/post/taintgrind-a-valgrind-poskvrnit-nastroj-pro-analyzu) (kindly translated by [Alex Novak](http://bizcow.com))
+Secretgrind is based on [Valgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
 
 Requirements:
 ------------
