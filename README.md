@@ -4,10 +4,15 @@ Secretgrind: a Valgrind analysis tool to detect secrets in memory
 Secretgrind is based on [Valgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
 Taintgrind is based on [Valgrind](http://valgrind/org)'s MemCheck and work by Will Drewry on [Flayer](http://code.google.com/p/flayer/).
 
+Warnings:
+---------
+	1. Secretgrind was tested on x86_64 Linux. If you encounter problems building/running it on different arch/platforms, create an issue [here](https://github.com/lmrs2/secretgrind/issues)
+	2. Do not run Secretgrind on untrusted software as the code has not been properly audited. There are a lot of memory-copy operations...
+	
 Requirements:
 ------------
 	1. Python must be installed on your machine for the installation process to complete
-	2. Please follow the instruction *in order*. You will get an error if you don't.
+	2. Please follow the instruction *in order*. You will get an error if you don't
 	
 Installation:
 -------------
