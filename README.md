@@ -1,7 +1,7 @@
 Secretgrind: a Valgrind analysis tool to detect secrets in memory
 =================================================================
 
-Secretgrind is based on [Valgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
+Secretgrind is based on [Taintgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
 Taintgrind is based on [Valgrind](http://valgrind/org)'s MemCheck and work by Will Drewry on [Flayer](http://code.google.com/p/flayer/).
 
 Warnings:
