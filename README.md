@@ -57,7 +57,7 @@ Installation:
 
 Usage
 -----
-	[me@machine ~/wherever/] alias secretgrind=~/valgrind-3.10.1/inst/bin/valgrind --tool=secretgrind
+	[me@machine ~/wherever/] alias secretgrind="~/valgrind-3.10.1/inst/bin/valgrind --tool=secretgrind"
 	[me@machine ~/wherever/] secretgrind --help
 	[me@machine ~/wherever/] secretgrind --file-filter=taintedfile.txt ./program_that_reads_tainted_file
 
@@ -108,6 +108,9 @@ Secretgrind is based on [Valgrind](https://github.com/wmkhoo/taintgrind) by Wei 
 Taintgrind is based on [Valgrind](http://valgrind/org)'s MemCheck and work by Will Drewry on [Flayer](http://code.google.com/p/flayer/).
 
 TODO: examples
+TODO: a note a untrusted sw
+TODO: vg_replace_malloc.c:296
+TODO: link to presentation
 
 The output of Secretgrind can be *huge*. You might consider piping the output to gzip.
 
