@@ -23,8 +23,7 @@ Installation:
 
 2. Git clone Secretgrind
 
-		[me@machine ~/valgrind-3.10.1] wget https://www.cl.cam.ac.uk/~lmrs2/secretgrind.zip
-		[me@machine ~/valgrind-3.10.1] 7z x secretgrind.zip
+		[me@machine ~/valgrind-3.10.1] git clone https://github.com/lmrs2/secretgrind.git
 		[me@machine ~/valgrind-3.10.1] cd secretgrind 
 
 3. Download Capstone
@@ -48,7 +47,7 @@ Installation:
 		[me@machine ~/valgrind-3.10.1/secretgrind] cd capstone-3.0.4
 		[me@machine ~/valgrind-3.10.1/secretgrind/capstone-3.0.4] sh make_capstone.sh
 
-6. Configure and build Taintgrind
+6. Configure and build Secretgrind
 
 		[me@machine ~/valgrind-3.10.1/secretgrind/capstone-3.0.4] cd ../
 		[me@machine ~/valgrind-3.10.1/secretgrind] ../autogen.sh
@@ -110,7 +109,7 @@ Taintgrind is based on [Valgrind](http://valgrind/org)'s MemCheck and work by Wi
 
 TODO: examples
 
-The output of Taintgrind can be *huge*. You might consider piping the output to gzip.
+The output of Secretgrind can be *huge*. You might consider piping the output to gzip.
 
 	[valgrind command] 2>&1 | gzip > output.gz
 
