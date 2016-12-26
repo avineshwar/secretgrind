@@ -110,7 +110,7 @@ Examples
 	[me@machine ~/examples] echo "This is a tainted file" > tainted.txt
 
 2. Consider the following code (test1.c)
-
+	```
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <stdio.h>
@@ -150,6 +150,7 @@ Examples
 		
 		return 0;
 	}
+	```
 	
 3. Compile as:
 	
@@ -261,7 +262,7 @@ memory regions, "stack", "global", and "other" for anything else.
 	==123==
 	
 We see that the tainted memory region [0x51ec040 - 0x51ec057] was tainted because of a call to read() in libc, and the call originated from the main() function.
-Furthermore, the tainted region belongs to the "parent" block [0x51ec040 - 0x51ec071] which is 50-byte long. The block was malloc()'ed by the main() function.
+Furthermore, the tainted region belongs to the "parent" block [0x51ec040 - 0x51ec071] which is 50-byte long ("malloc(LEN)"). The block was malloc()'ed by the main() function.
 There is a strange line about "malloc (vg_replace_malloc.c:XXX)": this is an artifact of Valgrind's instrumentation and can be ignored in practice.
 
 4.5 Sometimes it can be difficult to pinpoint which instruction is responsible for the tain, especially when it is because of register pressure, calling convention, etc.
@@ -298,6 +299,7 @@ So you objdump to check this before you resort to "--summary-fix-inst".
 at the moment. This will make Secregtgrind much much slower, as it will try to lookup the name of variables for each access to taint memory. So you use this option sparsely!
 Update the code as follows (note the use of a new stack variable "stack_var" and "stack_var = s[4];" to assign it some tainted data ):
 
+	```
 	[...]
 	
 	int main(int argc, char* argv[])
@@ -330,9 +332,9 @@ Update the code as follows (note the use of a new stack variable "stack_var" and
 		
 		return 0;
 	}
+	```
 	
-	
-and recompiler it as:
+and recompile it as:
 	
 	[me@machine ~/examples] gcc -Wall -O0 test1.c -o test1
 	
@@ -479,6 +481,7 @@ function arguments...
 
 To use those APIs, you must #include "secretgrind.h" in your file:
 
+	```
 	[...]
 	
 	#include "secretgrind.h"	// header file for APIs
@@ -523,7 +526,8 @@ To use those APIs, you must #include "secretgrind.h" in your file:
 		
 		return 0;
 	}
-
+	```
+	
 Compile as:
 
 	gcc -I/home/me/valgrind-3.10.1/inst/include/valgrind -Wall -O0 -g test1.c -o test1	# we want to see stack_var and names
