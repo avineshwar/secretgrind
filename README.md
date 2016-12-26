@@ -406,7 +406,7 @@ Examples
 		Total bytes tainted: 24
 		==123== 
 
-	The stack variable is no longer tainted. The compiler has optimized the binary somehow: for example, it could be keeping `stack_var` in a register rather than allocate it on the stack; or it may have removed `stack_var` entirely as this does not affect the program in a meaningful way. 
+	The stack variable is no longer tainted. The compiler has optimized the binary somehow: for example, it may be keeping `stack_var` in a register rather than allocate it on the stack; or it may have removed `stack_var` entirely as this does not affect the program in a meaningful way. 
 
 10. Secretgrind can also display a live trace of what is executed with **--trace=yes** option. The output can be overwhelming, so if you are only interested in the taint, it is good practice to use the option **--trace-taint-only=yes**:
 
@@ -430,7 +430,7 @@ Examples
 		---------------------------------------------------
 		[...]
 	
-	Secretgrind displays each instruction that are executed. The first that appears in the run is `0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:`. This shows both the raw instruction in hex `0f b6 40 04, its mnemonics `movzbl 4(%rax), %eax), and an instruction ID (_1cb40_`. This correponds to `stack_var = s[4];` in the source code. Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). That is why you see multiple lines of "execution"  for each instruction. As explained in [Taintgrind](https://github.com/wmkhoo/taintgrind), the output is a list of Valgrind IR (VEX) statements of the form:
+	Secretgrind displays each instruction that are executed. The first that appears in the run is `0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:`. This shows both the raw instruction in hex `0f b6 40 04`, its mnemonics `movzbl 4(%rax), %eax), and an instruction ID `_1cb40_`. This correponds to `stack_var = s[4];` in the source code. Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). That is why you see multiple lines of "execution"  for each instruction. As explained in [Taintgrind](https://github.com/wmkhoo/taintgrind), the output is a list of Valgrind IR (VEX) statements of the form:
 
 		Address/Location 	| VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
 		t14_9600 = 			  LOAD I8 t10_10371   | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
