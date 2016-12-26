@@ -110,7 +110,7 @@ Examples
 	[me@machine ~/examples] echo "This is a tainted file" > tainted.txt
 
 2. Consider the following code (test1.c)
-	```
+	```c
 	#include <stdlib.h>
 	#include <unistd.h>
 	#include <stdio.h>
