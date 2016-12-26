@@ -407,7 +407,7 @@ Examples
 		Total bytes tainted: 24
 		==123== 
 
-	The stack variable is no longer tainted. The compiler has realized `stack_var` is never used and has no effect on the program, so it has just removed it entirely from the binary. In other words, it no longer exists in the binary. That is why it is no longer tainted... Even if the variable was not removed entirely, it could be kept in a register rather than allocated on the stack: the register would be tainted but not memory, and so Secretgrind would still display only 24 tainted bytes. So if you come across unexpected results, look at the binary itself rather than rely on the source code.
+	The stack variable is no longer tainted. The compiler has optimized the binary somehow: for example, it could be keeping `stack_var` in a register rather than allocate it on the stack; or it may have removed `stack_var` entirely as this does not affect the program in a meaningful way. 
 
 10. Secretgrind can also display a live trace of what is executed with **--trace=yes** option. The output can be overwhelming, so if you are only interested in the taint, it is good practice to use the option **--trace-taint-only=yes**:
 
