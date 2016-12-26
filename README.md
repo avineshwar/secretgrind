@@ -455,8 +455,8 @@ instruction in hex (0f b6 40 04), its mnemonics (movzbl 4(%rax), %eax), and an i
 Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). That is why you see
 multiple lines of "execution"  for each instruction. As explained by [Taintgrind](https://github.com/wmkhoo/taintgrind), the output of taintgrind is a list of Valgrind IR (VEX) statements of the form:
 
-	Address/Location 			 | VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
-	t14_9600 = 					   LOAD I8 t10_10371  | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
+	Address/Location 	| VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
+	t14_9600 = 			  LOAD I8 t10_10371   | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
 
 Only one run-time/taint value per instruction is shown. That variable is usually the one being assigned, e.g. t14_9600 in this case. 
 In the case of an if-goto, it is the conditional variable; in the case of an indirect jump, it is the jump target. 
