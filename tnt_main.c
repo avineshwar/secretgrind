@@ -8532,8 +8532,8 @@ static void TNT_(display_names_of_mem_region)(Addr a, SizeT len, sn_addr_type_t 
 					} else {
 						// warn if the parent block was not released
 						EMIT_ERROR( (SN_ADDR_HEAP_MALLOC == mem_type) ? 
-									"        *** WARNING: the block was never free()'d!\n" : 
-									"        *** WARNING: the block was never munmap()'d!\n" );
+									"        *** WARNING: the block was not free()'d!\n" : 
+									"        *** WARNING: the block was not munmap()'d!\n" );
 					}
 											
 									
