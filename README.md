@@ -156,7 +156,7 @@ Examples
 	
 		[me@machine ~/examples] gcc -Wall -O0 test.c -o test
 	
-4.1 Run Secretgrind as:
+4. Run Secretgrind as:
 	
 		[me@machine ~/examples] secretgrind ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -172,12 +172,10 @@ Examples
 		No bytes tainted
 		==123== 
 
-By default, Secretgrind only displays a short summary about bytes tainted after returning from the main() function ("==123== [TAINT SUMMARY] - On end main():")
-and before exiting the program ("==123== [TAINT SUMMARY] - On exit():"). The n-digit number "==123==" indicates the process ID of the process during execution.
-In this run, the process ID is 123. This run indicates no taint "No bytes tainted" right after main() and before exit()'ing the program. This is normal since we
-have not indicated that the file tainted.txt should be considered tainted.
+	By default, Secretgrind only displays a short summary about bytes tainted after returning from the main() function ("==123== [TAINT SUMMARY] - On end main():") and before exiting the program ("==123== [TAINT SUMMARY] - On exit():"). The n-digit number "==123==" indicates the process ID of the process during execution. In this run, the process ID is 123. This run indicates no taint "No bytes tainted" right after main() and before exit()'ing the program. This is normal since we
+	have not indicated that the file tainted.txt should be considered tainted. 
 
-4.2 To tell Secretgind that tainted.txt is tainted, use the option **--file-filter=file1,file2,fileN** (the fullpath of files is necessary):
+5. To tell Secretgind that tainted.txt is tainted, use the option **--file-filter=file1,file2,fileN** (the fullpath of files is necessary):
 
 		[me@machine ~/examples] secretgrind --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -197,13 +195,9 @@ have not indicated that the file tainted.txt should be considered tainted.
 		Total bytes tainted: 24
 		==123== 
 
-By default, Secretgrind provides a short summary of each memory region found tainted. In this run, 24 bytes (range [0x51ec040 - 0x51ec057]) are tainted. It also 
-indicates the "type" of the memory that is tainted, here "malloc" since the variable "char \*s" was malloc()'ed. Other keywords you might see here are: 
-"fmmap" for mapp()'ed files, "mmap" for non-file mapp()'ed 
-memory regions, "stack", "global", and "other" for anything else.
+	By default, Secretgrind provides a short summary of each memory region found tainted. In this run, 24 bytes (range [0x51ec040 - 0x51ec057]) are tainted. It also indicates the "type" of the memory that is tainted, here "malloc" since the variable `char *s` was malloc()'ed. Other keywords you might see here are: "fmmap" for mapp()'ed files, "mmap" for non-file mapp()'ed memory regions, "stack", "global", and "other" for anything else.
 
-4.3 To get more information about the taint, such as the stacktrace that led to the taint, and how the block was allocated (in the case of malloc()'ed and mmap()'ed regions), 
-use option **--summary-verbose=yes**:
+6. To get more information about the taint, such as the stacktrace that led to the taint, and how the block was allocated (in the case of malloc()'ed and mmap()'ed regions), use option **--summary-verbose=yes**:
 
 		[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -241,8 +235,7 @@ use option **--summary-verbose=yes**:
 
 
 
-4.4 Taint after main() and before exit() may differ, and that is why Secretgrind displays both by default. But you can tell Secretgrind to display only one of them 
-through options **--summary-main-only=yes** or **--summary-exit-only=yes**:
+	Taint after main() and before exit() may differ, and that is why Secretgrind displays both by default. But you can tell Secretgrind to display only one of them through options **--summary-main-only=yes** or **--summary-exit-only=yes**:
 
 		[me@machine ~/examples] secretgrind --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -263,12 +256,9 @@ through options **--summary-main-only=yes** or **--summary-exit-only=yes**:
 		Total bytes tainted: 24
 		==123==
 	
-We see that the tainted memory region [0x51ec040 - 0x51ec057] was tainted because of a call to read() in libc, and the call originated from the main() function.
-Furthermore, the tainted region belongs to the "parent" block [0x51ec040 - 0x51ec071] which is 50-byte long ('malloc(LEN)'). The block was malloc()'ed by the main() function.
-There is a strange line about "malloc (vg_replace_malloc.c:XXX)": this is an artifact of Valgrind's instrumentation and can be ignored in practice.
+7. We see that the tainted memory region [0x51ec040 - 0x51ec057] was tainted because of a call to read() in libc, and the call originated from the main() function. Furthermore, the tainted region belongs to the "parent" block [0x51ec040 - 0x51ec071] which is 50-byte long (`malloc(LEN)`). The block was malloc()'ed by the main() function. There is a strange line about "malloc (vg_replace_malloc.c:XXX)": this is an artifact of Valgrind's instrumentation and can be ignored in practice.
 
-4.5 Sometimes it can be difficult to pinpoint which instruction is responsible for the tain, especially when it is because of register pressure, calling convention, etc.
-So you can also ask Secretgrind to display the instructions with option **--mnemonics=yes**:
+8. Sometimes it can be difficult to pinpoint which instruction is responsible for the tain, especially when it is because of register pressure, calling convention, etc. So you can also ask Secretgrind to display the instructions with option **--mnemonics=yes**:
 
 		[me@machine ~/examples] secretgrind --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -290,16 +280,10 @@ So you can also ask Secretgrind to display the instructions with option **--mnem
 		Total bytes tainted: 24
 		==123== 
 
-There is now an extra line indicating the instruction was "syscall" (0f 05 in hex). There is also an instruction ID "_1cb37_". If you ever see an inconsistent stacktrace, then 
-it is possible Secretgrind did not manage to retrieve the stacktrace correctly. In this case, you can the pass this instruction ID to **--summary-fix-inst=1cb37** to tell Secretgrind 
-to try to fix the problem. It worked fine here, so we need not use **--summary-fix-inst**. In general, Secretgrind gets the stacktrace right so 
-you should not have to use this option often in practice. Something you must be aware of if that your compiler may be inlining functions. So it is possible that you have 
-a function 'foo1() -> foo2() -> foo3() -> foo4()' i your source code, but the compiler might inline calls as 'foo1() -> foo2()'; where 'foo2()' contains the code of 'foo3()' and 'foo4()'.
-So you objdump to check this before you resort to **--summary-fix-inst**.
+	There is now an extra line indicating the instruction was "syscall" (0f 05 in hex). There is also an instruction ID "_1cb37_". If you ever see an inconsistent stacktrace, then it is possible Secretgrind did not manage to retrieve the stacktrace correctly. In this case, you can the pass this instruction ID to **--summary-fix-inst=1cb37** to tell Secretgrind 
+	to try to fix the problem. It worked fine here, so we need not use **--summary-fix-inst**. In general, Secretgrind gets the stacktrace right so you should not have to use this option often in practice. Something you must be aware of if that your compiler may be inlining functions. So it is possible that you have a function `foo1() -> foo2() -> foo3() -> foo4()` in your source code, but the compiler might inline calls as `foo1() -> foo2()`; where `foo2()` contains the code of `foo3()` and `foo4()`. So you objdump to check this before you resort to **--summary-fix-inst**.
 
-4.6 Secregrind can also be asked to retrieve the names (as they appear in the source code) of the variables that are tainted. This works for stack and global variables only 
-at the moment. This will make Secregtgrind much much slower, as it will try to lookup the name of variables for each access to taint memory. So you use this option sparsely!
-Update the code as follows (note the use of a new stack variable "stack_var" and 'stack_var = s[4];' to assign it some tainted data ):
+9. Secregrind can also be asked to retrieve the names (as they appear in the source code) of the variables that are tainted. This works for stack and global variables only at the moment. This will make Secregtgrind much much slower, as it will try to lookup the name of variables for each access to taint memory. So you use this option sparsely! Update the code as follows (note the use of a new stack variable `stack_var` and `stack_var = s[4];` to assign it some tainted data ):
 
 	```c
 	#include <stdlib.h>
@@ -344,13 +328,14 @@ Update the code as follows (note the use of a new stack variable "stack_var" and
 		
 		return 0;
 	}
+	
 	```
 	
-and recompile it as:
+	and recompile it as:
 	
 		[me@machine ~/examples] gcc -Wall -O0 test.c -o test
 	
-Now run Secretgrind and ask it to display variable names with option **--var-name=yes**:
+	Now run Secretgrind and ask it to display variable names with option **--var-name=yes**:
 
 		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -378,11 +363,11 @@ Now run Secretgrind and ask it to display variable names with option **--var-nam
 		Total bytes tainted: 25
 		==123==
 
-As expected, an extra byte is tainted, and it is a stack variable. However, Secregtgrind is unable to show us the original variable name. We can try to recompile with debugging information:
+	As expected, an extra byte is tainted, and it is a stack variable. However, Secregtgrind is unable to show us the original variable name. We can try to recompile with debugging information:
 
 		[me@machine ~/examples] gcc -g -Wall -O0 test.c -o test
 	
-Re-run Secretgrind:
+	Re-run Secretgrind:
 
 		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -401,15 +386,14 @@ Re-run Secretgrind:
 		Total bytes tainted: 25
 		==123== 
 
-Secregtgrind is now able to infer the information we want: "test1.c:18:@0xffefffb4b:stack_var": this means the variable is stored at address 0xffefffb4b, its name is 'stack_var'
-and was declared in the file test1.c at line 18.
+	Secregtgrind is now able to infer the information we want: "test1.c:18:@0xffefffb4b:stack_var": this means the variable is stored at address 0xffefffb4b, its name is `stack_var` and was declared in the file test1.c at line 18.
 
-Now recompile test.c with optimization:
+	Now recompile test.c with optimization:
 
 		[me@machine ~/examples] gcc -Wall -O2 test.c -o test
 	
 	
-and re-run Secretgrind:
+	and re-run Secretgrind:
 
 		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -423,14 +407,9 @@ and re-run Secretgrind:
 		Total bytes tainted: 24
 		==123== 
 
-The stack variable is no longer tainted. The compiler realized the stack_var was never used and has no effect on the program, so it has just removed it entirely 
-from the binary. In other words, it no longer exists in the binary. That is why it is no longer tainted... Even if the variable was not removed entirely, it could 
-be kept in a register rather than allocated on the stack: the register would be tainted but not memory, and so Secregtgrind would still display 
-only 24 tainted bytes. If you see unexpected results, look at the assembly code.
+	The stack variable is no longer tainted. The compiler realized the stack_var was never used and has no effect on the program, so it has just removed it entirely from the binary. In other words, it no longer exists in the binary. That is why it is no longer tainted... Even if the variable was not removed entirely, it could be kept in a register rather than allocated on the stack: the register would be tainted but not memory, and so Secregtgrind would still display only 24 tainted bytes. If you see unexpected results, look at the assembly code.
 
-
-4.7 Secretgrind can also display a live trace of what is executed with **--trace=yes** option. The output can be overwhelming, so if you are only interested in the taint, it is 
-good practice to **--trace-taint-only=yes**:
+10. Secretgrind can also display a live trace of what is executed with **--trace=yes** option. The output can be overwhelming, so if you are only interested in the taint, it is good practice to **--trace-taint-only=yes**:
 
 		[me@machine ~/examples] gcc -Wall -O0 test.c -o test	# we want to see stack_var
 		[me@machine ~/examples] secretgrind --trace-taint-only=yes --trace=yes --var-name=yes --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
@@ -452,30 +431,20 @@ good practice to **--trace-taint-only=yes**:
 		---------------------------------------------------
 		[...]
 	
-Secretgrind displays each instruction that are executed. The first that appears in the run is "0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:". This shows both the raw 
-instruction in hex (0f b6 40 04), its mnemonics (movzbl 4(%rax), %eax), and an instruction ID (_1cb40_). This correponds to 'stack_var = s[4];' in the source code.
-Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). That is why you see
-multiple lines of "execution"  for each instruction. As explained by [Taintgrind](https://github.com/wmkhoo/taintgrind), the output of taintgrind is a list of Valgrind IR (VEX) statements of the form:
+	Secretgrind displays each instruction that are executed. The first that appears in the run is "0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:". This shows both the raw instruction in hex (0f b6 40 04), its mnemonics (movzbl 4(%rax), %eax), and an instruction ID (_1cb40_). This correponds to `stack_var = s[4];` in the source code. Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). That is why you see multiple lines of "execution"  for each instruction. As explained by [Taintgrind](https://github.com/wmkhoo/taintgrind), the output of taintgrind is a list of Valgrind IR (VEX) statements of the form:
 
 		Address/Location 	| VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
 		t14_9600 = 			  LOAD I8 t10_10371   | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
 
-Only one run-time/taint value per instruction is shown. That variable is usually the one being assigned, e.g. t14_9600 in this case. 
-In the case of an if-goto, it is the conditional variable; in the case of an indirect jump, it is the jump target. 
-Loads and stores have two possible useful run-time values: the address and the data being loaded/stored. We have simply chosen to print the data.
-Runtime values are displayed as they appear in memory: for exmaple, on an LE platform the integer 4 will show as 0x04000000; on a BE platform
-it will show as 0x00000004. Here, t14_9600 is loaded with value 0x2000000000000000. 0x20 is the space character ' ', which is indeed the 5th character of 
-the string "This is a tainted file." contained in tainted.txt . The values loaded in t14_9600 is "variable" @0x51ec040_malloc_123_1, ie 
-data at memory address 0x51ec040, which is of type "malloc", allocated by process with pid "123" and Valgrind thread ID "1". 
-Details of VEX operators and IRStmts can be found in VEX/pub/libvex_ir.h .
+	Only one run-time/taint value per instruction is shown. That variable is usually the one being assigned, e.g. t14_9600 in this case. In the case of an if-goto, it is the conditional variable; in the case of an indirect jump, it is the jump target. Loads and stores have two possible useful run-time values: the address and the data being loaded/stored. We have simply chosen to print the data. Runtime values are displayed as they appear in memory: for exmaple, on an LE platform the integer 4 will show as 0x04000000; on a BE platform it will show as 0x00000004. Here, t14_9600 is loaded with value 0x2000000000000000. 0x20 is the space character ' ', which is indeed the 5th character of the string "This is a tainted file." contained in tainted.txt . The values loaded in t14_9600 is "variable" @0x51ec040_malloc_123_1, ie data at memory address 0x51ec040, which is of type "malloc", allocated by process with pid "123" and Valgrind thread ID "1".  Details of VEX operators and IRStmts can be found in VEX/pub/libvex_ir.h .
 
-If you are interested only in the total number of tainted bytes, and not the summary, you can use **--summary-total-only=yes**; and you can full disable the summary with **--summary=no**.
+11. If you are interested only in the total number of tainted bytes, and not the summary, you can use **--summary-total-only=yes**; and you can full disable the summary with **--summary=no**.
 
 	
 Client requests
 ---------------
 
-Secretgrind may be further controlled via client requests defined in secretgrind.h:
+1. Secretgrind may be further controlled via client requests defined in secretgrind.h:
 	
 		SG_PRINT_ALL_INST()			-> print all instructions
 		SG_PRINT_TAINTED_INST()			-> print tainted instructions
@@ -487,11 +456,9 @@ Secretgrind may be further controlled via client requests defined in secretgrind
 		SG_TAINT_SUMMARY(name)				-> display a summary
 		SG_READ_TAINT_STATE(name, address, length)	-> display taint for range [address - address + length - 1]
 	
-However, you should use those sparsely: as they are inserted in your code at compilation time, they change the original program binary.
-For example, you might see stack variables not tainted when you use these APIs, and not tainted when you do not - the stack may be used to push 
-function arguments...
+	However, you should use those sparsely: as they are inserted in your code at compilation time, they change the original program binary. For example, you might see stack variables not tainted when you use these APIs, and not tainted when you do not - the stack may be used to push function arguments...
 
-To use those APIs, you must '#include "secretgrind.h"' in your file:
+	To use those APIs, you must `#include "secretgrind.h"` in your file:
 
 	```c
 	#include <stdlib.h>
@@ -550,11 +517,11 @@ To use those APIs, you must '#include "secretgrind.h"' in your file:
 	}
 	```
 	
-Compile as:
+2. Compile as:
 
 		gcc -I/home/me/valgrind-3.10.1/inst/include/valgrind -Wall -O0 -g test.c -o test	# we want to see stack_var and names
 	
-Run, for example:
+3. Run, for example:
 
 		[me@machine ~/examples] secretgrind --var-name=yes --summary-main-only=yes --summary-verbose=yes --mnemonics=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -597,9 +564,7 @@ Run, for example:
 		Total bytes tainted: 32
 		==123== 
 
-We see additional information: two [TAINT SUMMARY] in response to calls to 'SG_TAINT_SUMMARY()', one [TAINT STATE] for 'SG_READ_TAINT_STATE()'.
-Furthermore, 'stack_var' is no longer tainted because of the call to 'SG_MAKE_MEM_UNTAINTED()', and 8 additional bytes are tainted because of the call
-to 'SG_MAKE_MEM_TAINTED()'. The instruction responsible for tainting 'n' is "API call" because it was tainted artificially by a call to 'SG_MAKE_MEM_TAINTED()'.
+	We see additional information: two [TAINT SUMMARY] in response to calls to `SG_TAINT_SUMMARY()`, one [TAINT STATE] for `SG_READ_TAINT_STATE()`. Furthermore, `stack_var` is no longer tainted due to the call to `SG_MAKE_MEM_UNTAINTED()`, and 8 additional bytes are tainted due to the call to `SG_MAKE_MEM_TAINTED()`. The instruction responsible for tainting `n` is "API call" because it was tainted artificially by a call to `SG_MAKE_MEM_TAINTED()`.
 
 Notes
 -----
