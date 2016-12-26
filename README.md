@@ -14,7 +14,7 @@ Requirements:
 ------------
 1. Python must be installed on your machine for the installation process to complete
 
-2. Please follow the instruction **in order**. You will get an error if you don't
+2. Please follow the instruction __in order__. You will get an error if you don't
 	
 Installation:
 -------------
