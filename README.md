@@ -177,9 +177,9 @@ and before exiting the program ("==123== [TAINT SUMMARY] - On exit():"). The n-d
 In this run, the process ID is 123. This run indicates no taint "No bytes tainted" right after main() and before exit()'ing the program. This is normal since we
 have not indicated that the file tainted.txt should be considered tainted.
 
-4.2 To tell Secretgind that tainted.txt is tainted, use the option --file-filter=file1,file2,fileN (the fullpath of files is necessary):
+4.2 To tell Secretgind that tainted.txt is tainted, use the option *--file-filter=file1,file2,fileN* (the fullpath of files is necessary):
 
-		[me@machine ~/examples] secretgrind --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind *--file-filter=/home/me/examples/tainted.txt* ./test tainted.txt
 		[me@machine ~/examples] ...
 
 		==123== [TAINT SUMMARY] - On end main():
@@ -202,9 +202,10 @@ indicates the "type" of the memory that is tainted, here "malloc" since the vari
 "fmmap" for mapp()'ed files, "mmap" for non-file mapp()'ed 
 memory regions, "stack", "global", and "other" for anything else.
 
-4.3 To get more information about the taint, such as the stacktrace that led to the taint, and how the block was allocated (in the case of malloc()'ed and mmap()'ed regions), run:
+4.3 To get more information about the taint, such as the stacktrace that led to the taint, and how the block was allocated (in the case of malloc()'ed and mmap()'ed regions), 
+use option *--summary-verbose=yes*:
 
-		[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind *--summary-verbose=yes* --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 
 		==123== [TAINT SUMMARY] - On end main():
@@ -240,9 +241,10 @@ memory regions, "stack", "global", and "other" for anything else.
 
 
 
-4.4 Taint after main() and before exit() may differ, and that is why Secretgrind displays both by default. But you can tell Secretgrind to display only one of them:
+4.4 Taint after main() and before exit() may differ, and that is why Secretgrind displays both by default. But you can tell Secretgrind to display only one of them 
+through options *--summary-main-only=yes* or *--summary-exit-only=yes*:
 
-		[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind *--summary-main-only=yes* --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 
 		==123== [TAINT SUMMARY] - On end main():
@@ -266,9 +268,9 @@ Furthermore, the tainted region belongs to the "parent" block [0x51ec040 - 0x51e
 There is a strange line about "malloc (vg_replace_malloc.c:XXX)": this is an artifact of Valgrind's instrumentation and can be ignored in practice.
 
 4.5 Sometimes it can be difficult to pinpoint which instruction is responsible for the tain, especially when it is because of register pressure, calling convention, etc.
-So you can also ask Secretgrind to display the instructions:
+So you can also ask Secretgrind to display the instructions with option *--mnemonics=yes*:
 
-		[me@machine ~/examples] secretgrind --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind *--mnemonics=yes* --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 
 		==123== [TAINT SUMMARY] - On end main():
@@ -348,9 +350,9 @@ and recompile it as:
 	
 		[me@machine ~/examples] gcc -Wall -O0 test.c -o test
 	
-Now run Secretgrind and ask it to display variable names:
+Now run Secretgrind and ask it to display variable names with option *--var-name=yes*:
 
-		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind *--var-name=yes* --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 	
 
@@ -382,7 +384,7 @@ As expected, an extra byte is tainted, and it is a stack variable. However, Secr
 	
 Re-run Secretgrind:
 
-		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 	
 		==123== [TAINT SUMMARY] - On end main():
@@ -402,7 +404,7 @@ Re-run Secretgrind:
 Secregtgrind is now able to infer the information we want: "test1.c:18:@0xffefffb4b:stack_var": this means the variable is stored at address 0xffefffb4b, its name is stack_var
 and was declared in the file test1.c at line 18.
 
-Now recompile test1.c with optimization:
+Now recompile test.c with optimization:
 
 		[me@machine ~/examples] gcc -Wall -O2 test.c -o test
 	
@@ -427,11 +429,11 @@ be kept in a register rather than allocated on the stack: the register would be 
 only 24 tainted bytes. If you see unexpected results, look at the assembly code.
 
 
-4.7 Secretgrind can also display a live trace of what is executed with --trace=yes option. The output can be overwhelming, so if you are only interested in the taint, it is 
-good practice to --trace-taint-only=yes:
+4.7 Secretgrind can also display a live trace of what is executed with *--trace=yes* option. The output can be overwhelming, so if you are only interested in the taint, it is 
+good practice to *--trace-taint-only=yes*:
 
 		[me@machine ~/examples] gcc -Wall -O0 test.c -o test	# we want to see stack_var
-		[me@machine ~/examples] secretgrind --trace-taint-only=yes --trace=yes --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] secretgrind *--trace-taint-only=yes --trace=yes* --var-name=yes --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 
 		==123== 0x400834: 0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:
