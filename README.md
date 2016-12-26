@@ -106,7 +106,8 @@ Usage
 Examples
 --------
 1. Create a file containing tainted data:
-	[me@machine ~/examples] echo "This is a tainted file" > tainted.txt
+	
+		[me@machine ~/examples] echo "This is a tainted file" > tainted.txt
 
 2. Consider the following code (call it test.c):
 	```c
@@ -153,23 +154,23 @@ Examples
 	
 3. Compile as:
 	
-	[me@machine ~/examples] gcc -Wall -O0 test.c -o test
+		[me@machine ~/examples] gcc -Wall -O0 test.c -o test
 	
 4.1 Run Secretgrind as:
 	
-	[me@machine ~/examples] secretgrind ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		[me@machine ~/examples] secretgrind ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	No bytes tainted
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	==123== [TAINT SUMMARY] - On exit():
-	---------------------------------------------------
+		No bytes tainted
 
-	No bytes tainted
-	==123== 
+		==123== [TAINT SUMMARY] - On exit():
+		---------------------------------------------------
+
+		No bytes tainted
+		==123== 
 
 By default, Secretgrind only displays a short summary about bytes tainted after returning from the main() function ("==123== [TAINT SUMMARY] - On end main():")
 and before exiting the program ("==123== [TAINT SUMMARY] - On exit():"). The n-digit number "==123==" indicates the process ID of the process during execution.
@@ -178,23 +179,23 @@ have not indicated that the file tainted.txt should be considered tainted.
 
 4.2 To tell Secretgind that tainted.txt is tainted, use the option --file-filter=file1,file2,fileN (the fullpath of files is necessary):
 
-	[me@machine ~/examples] secretgrind --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		[me@machine ~/examples] secretgrind --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	Total bytes tainted: 24
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
 
-	==123== [TAINT SUMMARY] - On exit():
-	---------------------------------------------------
+		Total bytes tainted: 24
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		==123== [TAINT SUMMARY] - On exit():
+		---------------------------------------------------
 
-	Total bytes tainted: 24
-	==123== 
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+
+		Total bytes tainted: 24
+		==123== 
 
 By default, Secretgrind provides a short summary of each memory region found tainted. In this run, 24 bytes (range [0x51ec040 - 0x51ec057]) are tainted. It also 
 indicates the "type" of the memory that is tainted, here "malloc" since the variable "char *s" was malloc()'ed. Other keywords you might see here are: 
@@ -203,62 +204,62 @@ memory regions, "stack", "global", and "other" for anything else.
 
 4.3 To get more information about the taint, such as the stacktrace that led to the taint, and how the block was allocated (in the case of malloc()'ed and mmap()'ed regions), run:
 
-	[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
-			tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
-						by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-		 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2030_1
-			malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
-						by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
-						by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	Total bytes tainted: 24
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
+				tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
+							by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+			 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2030_1
+				malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
+							by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
+							by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
 
-	==123== [TAINT SUMMARY] - On exit():
-	---------------------------------------------------
+		Total bytes tainted: 24
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
-			tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
-						by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-		 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2030_1
-			malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
-						by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
-						by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+		==123== [TAINT SUMMARY] - On exit():
+		---------------------------------------------------
 
-	Total bytes tainted: 24
-	==123== 
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
+				tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
+							by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+			 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2030_1
+				malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
+							by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
+							by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+
+		Total bytes tainted: 24
+		==123== 
 
 
 
 4.4 Taint after main() and before exit() may differ, and that is why Secretgrind displays both by default. But you can tell Secretgrind to display only one of them:
 
-	[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		[me@machine ~/examples] secretgrind --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
-			tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
-						by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-		 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2030_1
-			malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
-						by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
-						by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	Total bytes tainted: 24
-	==123==
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
+				tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
+							by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+			 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2030_1
+				malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
+							by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
+							by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+
+		Total bytes tainted: 24
+		==123==
 	
 We see that the tainted memory region [0x51ec040 - 0x51ec057] was tainted because of a call to read() in libc, and the call originated from the main() function.
 Furthermore, the tainted region belongs to the "parent" block [0x51ec040 - 0x51ec071] which is 50-byte long ("malloc(LEN)"). The block was malloc()'ed by the main() function.
@@ -267,25 +268,25 @@ There is a strange line about "malloc (vg_replace_malloc.c:XXX)": this is an art
 4.5 Sometimes it can be difficult to pinpoint which instruction is responsible for the tain, especially when it is because of register pressure, calling convention, etc.
 So you can also ask Secretgrind to display the instructions:
 
-	[me@machine ~/examples] secretgrind --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		[me@machine ~/examples] secretgrind --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
-			tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
-						by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			tainted     by instruction 'syscall ' (raw=0f 05, ID=_1cb37_)
-		 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2491_1
-			malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
-						by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
-						by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	Total bytes tainted: 24
-	==123== 
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): 0x51ec040
+				tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
+							by 0x4007F2: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				tainted     by instruction 'syscall ' (raw=0f 05, ID=_1cb37_)
+			 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_2491_1
+				malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
+							by 0x40074C: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
+							by 0x40084D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+
+		Total bytes tainted: 24
+		==123== 
 
 There is now an extra line indicating the instruction was "syscall" (0f 05 in hex). There is also an instruction ID "_1cb37_". If you ever see an inconsistent stacktrace, then 
 it is possible Secretgrind did not manage to retrieve the stacktrace correctly. In this case, you can the pass this instruction ID to --summary-fix-inst=1cb37 to tell Secretgrind 
@@ -345,80 +346,80 @@ Update the code as follows (note the use of a new stack variable "stack_var" and
 	
 and recompile it as:
 	
-	[me@machine ~/examples] gcc -Wall -O0 test.c -o test
+		[me@machine ~/examples] gcc -Wall -O0 test.c -o test
 	
 Now run Secretgrind and ask it to display variable names:
 
-	[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
+		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 	
 
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): @0x51ec040_malloc_4208_1
-			tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
-						by 0x4007F6: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			tainted     by instruction 'syscall ' (raw=0f 05, ID=_1cb38_)
-		 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_4208_1
-			malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
-						by 0x400750: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
-						by 0x40085D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): @0x51ec040_malloc_4208_1
+				tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
+							by 0x4007F6: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				tainted     by instruction 'syscall ' (raw=0f 05, ID=_1cb38_)
+			 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_4208_1
+				malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
+							by 0x400750: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
+							by 0x40085D: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
 
-	***(2) (stack)	 range [0xffefffb4b - 0xffefffb4b]	 (1 bytes)	 is tainted
-	   > (stack) [0xffefffb4b - 0xffefffb4b] (1 bytes): obj_test1@0xffefffb4b_unknownvar_4208_1
-			tainted     at 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
-			tainted     by instruction 'movb %al, -0x25(%rbp)' (raw=88 45 db, ID=_1cb41_)
+		***(2) (stack)	 range [0xffefffb4b - 0xffefffb4b]	 (1 bytes)	 is tainted
+		   > (stack) [0xffefffb4b - 0xffefffb4b] (1 bytes): obj_test1@0xffefffb4b_unknownvar_4208_1
+				tainted     at 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1)
+				tainted     by instruction 'movb %al, -0x25(%rbp)' (raw=88 45 db, ID=_1cb41_)
 
-	Total bytes tainted: 25
-	==123==
+		Total bytes tainted: 25
+		==123==
 
 As expected, an extra byte is tainted, and it is a stack variable. However, Secregtgrind is unable to show us the original variable name. We can try to recompile with debugging information:
 
-	[me@machine ~/examples] gcc -g -Wall -O0 test.c -o test
+		[me@machine ~/examples] gcc -g -Wall -O0 test.c -o test
 	
 Re-run Secretgrind:
 
-	[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
+		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   [...]
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   [...]
 
-	***(2) (stack)	 range [0xffefffb4b - 0xffefffb4b]	 (1 bytes)	 is tainted
-	   > (stack) [0xffefffb4b - 0xffefffb4b] (1 bytes): test1.c:18:@0xffefffb4b:stack_var
-			tainted     at 0x400838: main (test1.c:35)
-			tainted     by instruction 'movb %al, -0x25(%rbp)' (raw=88 45 db, ID=_1cb41_)
+		***(2) (stack)	 range [0xffefffb4b - 0xffefffb4b]	 (1 bytes)	 is tainted
+		   > (stack) [0xffefffb4b - 0xffefffb4b] (1 bytes): test1.c:18:@0xffefffb4b:stack_var
+				tainted     at 0x400838: main (test1.c:35)
+				tainted     by instruction 'movb %al, -0x25(%rbp)' (raw=88 45 db, ID=_1cb41_)
 
-	Total bytes tainted: 25
-	==123== 
+		Total bytes tainted: 25
+		==123== 
 
 Secregtgrind is now able to infer the information we want: "test1.c:18:@0xffefffb4b:stack_var": this means the variable is stored at address 0xffefffb4b, its name is stack_var
 and was declared in the file test1.c at line 18.
 
 Now recompile test1.c with optimization:
 
-	[me@machine ~/examples] gcc -Wall -O2 test.c -o test
+		[me@machine ~/examples] gcc -Wall -O2 test.c -o test
 	
 	
 and re-run Secretgrind:
 
-	[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
+		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   [...]
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   [...]
 
-	Total bytes tainted: 24
-	==123== 
+		Total bytes tainted: 24
+		==123== 
 
 The stack variable is no longer tainted. The compiler realized the stack_var was never used and has no effect on the program, so it has just removed it entirely 
 from the binary. In other words, it no longer exists in the binary. That is why it is no longer tainted... Even if the variable was not removed entirely, it could 
@@ -429,33 +430,33 @@ only 24 tainted bytes. If you see unexpected results, look at the assembly code.
 4.7 Secretgrind can also display a live trace of what is executed with --trace=yes option. The output can be overwhelming, so if you are only interested in the taint, it is 
 good practice to --trace-taint-only=yes:
 
-	[me@machine ~/examples] gcc -Wall -O0 test.c -o test	# we want to see stack_var
-	[me@machine ~/examples] secretgrind --trace-taint-only=yes --trace=yes --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== 0x400834: 0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:
-	==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t14_9600 = LOAD I8 t10_10371 | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
-	==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t29_5404 = 8Uto32 t14_9600 | 0x2000000000000000 | 0xff00000000000000 | t29_5404 <- t14_9600
-	==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t13_11966 = t29_5404 | 0x2000000000000000 | 0xff00000000000000 | t13_11966 <- t29_5404
-	==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t30_6184 = 32Uto64 t13_11966 | 0x2000000000000000 | 0xff00000000000000 | t30_6184 <- t13_11966
-	==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t12_11569 = t30_6184 | 0x2000000000000000 | 0xff00000000000000 | t12_11569 <- t30_6184
-	==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | r16_1 = t12_11569 | 0x2000000000000000 | 0xff00000000000000 | r16_1 <- t12_11569
+		[me@machine ~/examples] gcc -Wall -O0 test.c -o test	# we want to see stack_var
+		[me@machine ~/examples] secretgrind --trace-taint-only=yes --trace=yes --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	==123== 0x400838: 88 45 db: movb %al, -0x25(%rbp)     ID _1cb41_:
-	==123== 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t17_9609 = r16_1 I8 | 0x2000000000000000 | 0xff00000000000000 | t17_9609 <- r16_1
-	==123== 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | STORE t15_10583 = t17_9609 | 0x2000000000000000 | 0xff00000000000000 | obj_test1@0xffefffb4b_unknownvar_123_1 <- t17_9609
+		==123== 0x400834: 0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:
+		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t14_9600 = LOAD I8 t10_10371 | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
+		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t29_5404 = 8Uto32 t14_9600 | 0x2000000000000000 | 0xff00000000000000 | t29_5404 <- t14_9600
+		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t13_11966 = t29_5404 | 0x2000000000000000 | 0xff00000000000000 | t13_11966 <- t29_5404
+		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t30_6184 = 32Uto64 t13_11966 | 0x2000000000000000 | 0xff00000000000000 | t30_6184 <- t13_11966
+		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t12_11569 = t30_6184 | 0x2000000000000000 | 0xff00000000000000 | t12_11569 <- t30_6184
+		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | r16_1 = t12_11569 | 0x2000000000000000 | 0xff00000000000000 | r16_1 <- t12_11569
 
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
-	[...]
+		==123== 0x400838: 88 45 db: movb %al, -0x25(%rbp)     ID _1cb41_:
+		==123== 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t17_9609 = r16_1 I8 | 0x2000000000000000 | 0xff00000000000000 | t17_9609 <- r16_1
+		==123== 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | STORE t15_10583 = t17_9609 | 0x2000000000000000 | 0xff00000000000000 | obj_test1@0xffefffb4b_unknownvar_123_1 <- t17_9609
+
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
+		[...]
 	
 Secretgrind displays each instruction that are executed. The first that appears in the run is "0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:". This shows both the raw 
 instruction in hex (0f b6 40 04), its mnemonics (movzbl 4(%rax), %eax), and an instruction ID (_1cb40_). This correponds to "stack_var = s[4];" in the source code.
 Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). That is why you see
 multiple lines of "execution"  for each instruction. As explained by [Taintgrind](https://github.com/wmkhoo/taintgrind), the output of taintgrind is a list of Valgrind IR (VEX) statements of the form:
 
-	Address/Location 	| VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
-	t14_9600 = 			  LOAD I8 t10_10371   | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
+		Address/Location 	| VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
+		t14_9600 = 			  LOAD I8 t10_10371   | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
 
 Only one run-time/taint value per instruction is shown. That variable is usually the one being assigned, e.g. t14_9600 in this case. 
 In the case of an if-goto, it is the conditional variable; in the case of an indirect jump, it is the jump target. 
@@ -474,15 +475,15 @@ Client requests
 
 Secretgrind may be further controlled via client requests defined in secretgrind.h:
 	
-	SG_PRINT_ALL_INST()			-> print all instructions
-	SG_PRINT_TAINTED_INST()			-> print tainted instructions
-	SG_STOP_PRINT()				-> stop all printing
-	
-	SG_MAKE_MEM_TAINTED(address, length)	-> taint memory region
-	SG_MAKE_MEM_UNTAINTED(address, length)	-> untaint memory region
-	
-	SG_TAINT_SUMMARY(name)				-> display a summary
-	SG_READ_TAINT_STATE(name, address, length)	-> display taint for range [address - address + length - 1]
+		SG_PRINT_ALL_INST()			-> print all instructions
+		SG_PRINT_TAINTED_INST()			-> print tainted instructions
+		SG_STOP_PRINT()				-> stop all printing
+
+		SG_MAKE_MEM_TAINTED(address, length)	-> taint memory region
+		SG_MAKE_MEM_UNTAINTED(address, length)	-> untaint memory region
+
+		SG_TAINT_SUMMARY(name)				-> display a summary
+		SG_READ_TAINT_STATE(name, address, length)	-> display taint for range [address - address + length - 1]
 	
 However, you should use those sparsely: as they are inserted in your code at compilation time, they change the original program binary.
 For example, you might see stack variables not tainted when you use these APIs, and not tainted when you do not - the stack may be used to push 
@@ -549,50 +550,50 @@ To use those APIs, you must #include "secretgrind.h" in your file:
 	
 Compile as:
 
-	gcc -I/home/me/valgrind-3.10.1/inst/include/valgrind -Wall -O0 -g test.c -o test	# we want to see stack_var and names
+		gcc -I/home/me/valgrind-3.10.1/inst/include/valgrind -Wall -O0 -g test.c -o test	# we want to see stack_var and names
 	
 Run, for example:
 
-	[me@machine ~/examples] secretgrind --var-name=yes --summary-main-only=yes --summary-verbose=yes --mnemonics=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
-	[me@machine ~/examples] ...
-	
-	==123== [TAINT SUMMARY] - before we read:
-	---------------------------------------------------
+		[me@machine ~/examples] secretgrind --var-name=yes --summary-main-only=yes --summary-verbose=yes --mnemonics=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
+		[me@machine ~/examples] ...
 
-	No bytes tainted
+		==123== [TAINT SUMMARY] - before we read:
+		---------------------------------------------------
 
-	==123== [TAINT SUMMARY] - after we read:
-	---------------------------------------------------
+		No bytes tainted
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		==123== [TAINT SUMMARY] - after we read:
+		---------------------------------------------------
 
-	Total bytes tainted: 24
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
 
-	[TAINT STATE]: stack_var taint (1 bytes)
-		range [0xffefffa33 - 0xffefffa33] (1 bytes)	is NOT tainted
-	
-	==123== [TAINT SUMMARY] - On end main():
-	---------------------------------------------------
+		Total bytes tainted: 24
 
-	***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-	   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): @0x51ec040_malloc_10382_1
-			tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
-						by 0x400AD3: main (test1.c:34)
-			tainted     by instruction 'syscall ' (raw=0f 05, ID=_1cb45_)
-		 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_10382_1
-			malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
-						by 0x400997: main (test1.c:22)
-			free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
-						by 0x400C50: main (test1.c:47)
+		[TAINT STATE]: stack_var taint (1 bytes)
+			range [0xffefffa33 - 0xffefffa33] (1 bytes)	is NOT tainted
 
-	***(1) (stack)	 range [0xffefffa38 - 0xffefffa3f]	 (8 bytes)	 is tainted
-	   > (stack) [0xffefffa38 - 0xffefffa3f] (8 bytes): test1.c:19:@0xffefffa38:n
-			tainted     at 0x400D16: main (test1.c:51)
-			tainted     by API call
+		==123== [TAINT SUMMARY] - On end main():
+		---------------------------------------------------
+
+		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
+		   > (malloc) [0x51ec040 - 0x51ec057] (24 bytes): @0x51ec040_malloc_10382_1
+				tainted     at 0x4F13F30: read (in /lib/x86_64-linux-gnu/libc-2.15.so)
+							by 0x400AD3: main (test1.c:34)
+				tainted     by instruction 'syscall ' (raw=0f 05, ID=_1cb45_)
+			 Parent block [0x51ec040 - 0x51ec071] (50 bytes): @0x51ec040_malloc_10382_1
+				malloc()'ed at 0x4C2B3E4: malloc (vg_replace_malloc.c:296)
+							by 0x400997: main (test1.c:22)
+				free()'ed   at 0x4C2A2EA: free (vg_replace_malloc.c:473)
+							by 0x400C50: main (test1.c:47)
+
+		***(1) (stack)	 range [0xffefffa38 - 0xffefffa3f]	 (8 bytes)	 is tainted
+		   > (stack) [0xffefffa38 - 0xffefffa3f] (8 bytes): test1.c:19:@0xffefffa38:n
+				tainted     at 0x400D16: main (test1.c:51)
+				tainted     by API call
 
 
-	Total bytes tainted: 32
-	==123== 
+		Total bytes tainted: 32
+		==123== 
 
 We see additional information: two [TAINT SUMMARY] in response to calls to SG_TAINT_SUMMARY(), one [TAINT STATE] for SG_READ_TAINT_STATE().
 Furthermore, stack_var is no longer tainted because of the call to SG_MAKE_MEM_UNTAINTED(), and 8 additional bytes are tainted because of the call
