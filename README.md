@@ -106,10 +106,9 @@ Usage
 Examples
 --------
 1. Create a file containing tainted data:
-
 	[me@machine ~/examples] echo "This is a tainted file" > tainted.txt
 
-2. Consider the following code (call it test.c)
+2. Consider the following code (call it test.c):
 	```c
 	#include <stdlib.h>
 	#include <unistd.h>
