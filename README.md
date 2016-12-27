@@ -532,7 +532,7 @@ Client requests
 
 		Total bytes tainted: 24
 
-		[TAINT STATE]: stack_var taint (1 bytes)
+		==123== [TAINT STATE]: stack_var taint (1 bytes)
 			range [0xffefffa33 - 0xffefffa33] (1 bytes)	is NOT tainted
 
 		==123== [TAINT SUMMARY] - On end main():
