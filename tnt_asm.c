@@ -1,6 +1,6 @@
 /*
  * 
- * I could not find a way to get the guest architecture at run time.
+ * Not sure if it's possible to get the guest architecture at run time.
  * The instrument() function in tnt_translate.c has a parameter 
  * VexArchInfo* archinfo_host, but this is the host, not the guest.
  * This is called from VEX/priv/main_main.c
@@ -71,7 +71,7 @@
 
 // global variables
 #define INVALID (-1)
-static csh handle 		= 	INVALID;
+static csh handle 	= 	INVALID;
 static cs_insn *insn 	= 	(void*)INVALID;
 static cs_arch arch	=	INVALID;
 static cs_mode mode 	=	INVALID;
@@ -81,7 +81,7 @@ static Bool is_init(void) {
 }
 
 static void reset(void) {
-	handle 		= 	INVALID;
+	handle 	= 	INVALID;
 	insn 	= 	(void*)INVALID;
 	arch	=	INVALID;
 	mode 	=	INVALID;
