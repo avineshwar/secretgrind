@@ -386,13 +386,9 @@ Examples
 
 	Secretgrind is now able to retrieve the variable name as `test1.c:18:@0xffefffb4b:stack_var`: the variable is stored at address 0xffefffb4b, its name is `stack_var` and it was declared in the file test1.c at line 18.
 
-	Now recompile test.c with optimization:
+	Now recompile test.c with optimization and re-run Secretgrind:
 
 		[me@machine ~/examples] gcc -Wall -O2 test.c -o test
-	
-	
-	and re-run Secretgrind:
-
 		[me@machine ~/examples] secretgrind --var-name=yes --mnemonics=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
 	
@@ -515,7 +511,7 @@ Client requests
 	}
 	```
 	
-2. Tell the compiler where to find the header filer `secretgrind.h`, and compile as:
+2. Tell the compiler where to find the header file `secretgrind.h`, and compile as:
 
 		gcc -I/home/me/valgrind-3.10.1/inst/include/valgrind -Wall -O0 -g test.c -o test	# we want to see stack_var and names
 	
