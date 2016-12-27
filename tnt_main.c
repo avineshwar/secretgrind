@@ -8007,7 +8007,7 @@ static void var_taint_status(char *desc, Addr a, SizeT len)
 	prev_byteTaint = (vabits2 != VA_BITS2_UNTAINTED); // could be fully or partially tainted
 	++currAddr;
 	
-	VG_(printf)("\n[TAINT STATE]: %s (%lu bytes)\n", desc, len);
+	VG_(printf)("\n==%u== [TAINT STATE]: %s (%lu bytes)\n", VG_(getpid)(), desc, len);
 	// old form VG_(printf)("[TAINT STATE]: %s '%s' (size=%lu) %s 0x%lx is %s\n", isScalar?"scalar":"pointer", vname, currAddr-startAddr, isScalar?"at address":"pointing to address", startAddr, status);
 	// Note: we should take advantage of multi-byte taint checks:TODO
 	for (; currAddr<endAddr; ++currAddr) {
