@@ -558,7 +558,7 @@ Client requests
 		Total bytes tainted: 32
 		==123== 
 
-	We see additional information: two `[TAINT SUMMARY]` in response to calls to `SG_TAINT_SUMMARY()`, one `[TAINT STATE]` for `SG_READ_TAINT_STATE()`. At the end of `main()`, `stack_var` is no longer tainted due to the call to `SG_MAKE_MEM_UNTAINTED()`, and 8 additional bytes are tainted due to the call to `SG_MAKE_MEM_TAINTED()`. The instruction responsible for tainting `n` is "API call" because it was tainted artificially by a call to `SG_MAKE_MEM_TAINTED()`.
+	We see additional information: two `[TAINT SUMMARY]` in response to calls to `SG_TAINT_SUMMARY()`, one `[TAINT STATE]` for `SG_READ_TAINT_STATE()`. At the end of `main()`, `stack_var` is no longer tainted due to the call to `SG_MAKE_MEM_UNTAINTED()`, and 8 additional bytes are tainted due to the call to `SG_MAKE_MEM_TAINTED()`. The instruction responsible for tainting `n` is `API call` because it was tainted artificially by a call to `SG_MAKE_MEM_TAINTED()`.
 
 Notes
 -----
