@@ -24,7 +24,7 @@ Installation:
 
 		[me@machine ~/] wget valgrind.org/downloads/valgrind-3.10.1.tar.bz2
 		[me@machine ~/] diff <(sha256sum -b valgrind-3.10.1.tar.bz2) <(echo 'fa253dc26ddb661b6269df58144eff607ea3f76a9bcfe574b0c7726e1dfcb997 *valgrind-3.10.1.tar.bz2')
-                    		An empty results means files are identical
+                    		An empty result means files are identical
 		[me@machine ~/] tar jxvf valgrind-3.10.1.tar.bz2
 		[me@machine ~/] cd valgrind-3.10.1
 
@@ -448,7 +448,7 @@ Client requests
 		SG_MAKE_MEM_UNTAINTED(address, length)          -> untaint memory region
 
 		SG_TAINT_SUMMARY(name)                          -> display a summary
-		SG_READ_TAINT_STATE(name, address, length)      -> display taint for range [address - address + length - 1]
+		SG_READ_TAINT_STATE(name, address, length)      -> display taint for 'length' bytes from 'address'
 	
 	However, you should use those sparsely: as they are inserted in your code at compilation time, they change the original program binary. For example, you might see stack variables not tainted when you use these APIs, but tainted when you do not - the stack may be used to push function arguments...
 
