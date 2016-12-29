@@ -255,9 +255,9 @@ Examples
 		Total bytes tainted: 24
 		==123==
 	
-7. The tainted memory region `[0x51ec040 - 0x51ec057]` was tainted because of a call to `read()` in libc `/lib/x86_64-linux-gnu/libc-2.15.so`, and the call originated from the `main()` function. Furthermore, the tainted region belongs to the "parent" block `[0x51ec040 - 0x51ec071]` which is 50-byte long - this corresponds to the call to `malloc(LEN)`). The block was malloc()'ed by the `main()` function. There is a strange line `malloc (vg_replace_malloc.c:XXX)`: this is an artifact of Valgrind's instrumentation and can be ignored in practice.
+	The tainted memory region `[0x51ec040 - 0x51ec057]` was tainted because of a call to `read()` in libc `/lib/x86_64-linux-gnu/libc-2.15.so`, and the call originated from the `main()` function. Furthermore, the tainted region belongs to the "parent" block `[0x51ec040 - 0x51ec071]` which is 50-byte long - this corresponds to the call to `malloc(LEN)`). The block was malloc()'ed by the `main()` function. There is a strange line `malloc (vg_replace_malloc.c:XXX)`: this is an artifact of Valgrind's instrumentation and can be ignored in practice.
 
-8. Sometimes it can be difficult to pinpoint which instruction is responsible for the taint, especially when it is because of register pressure, calling convention, etc. So you can get Secretgrind to display instructions in the verbose summary with option **--mnemonics=yes**:
+7. Sometimes it can be difficult to pinpoint which instruction is responsible for the taint, especially when it is because of register pressure, calling convention, etc. So you can get Secretgrind to display instructions in the verbose summary with option **--mnemonics=yes**:
 
 		[me@machine ~/examples] secretgrind --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
 		[me@machine ~/examples] ...
@@ -281,7 +281,7 @@ Examples
 
 	There is now an extra line indicating the instruction was `syscall` (0f 05 in hex). There is also an instruction ID `_1cb37_`. If you ever see an inconsistent stacktrace (eg an empty one), then it is possible Secretgrind did not manage to retrieve the stacktrace correctly. If this happens, you can pass this instruction ID to **--summary-fix-inst=1cb37** to tell Secretgrind to try to fix the problem. It worked fine here, so we need not use **--summary-fix-inst**. In general, Secretgrind gets the stacktrace right so you should not have to use this option often in practice. Something you must be aware of if that your compiler may be inlining functions. So if you have a function `foo1() -> foo2() -> foo3() -> foo4()` in your source code, your compiler might inline calls as `foo1() -> foo2()`; where `foo2()` contains the code of `foo3()` and `foo4()`. Try looking at the binary (eg with objdump) to check this before you resort to **--summary-fix-inst**.
 
-9. Secregrind can also retrieve the names (as they appear in the source code) of the variables that are tainted. This works for stack and global variables. It also makes Secretgrind much much slower, as it must look up the name of variables for each access to tainted memory. So use this option sparsely! Now update the code as follows (note the use of a new stack variable `stack_var` and `stack_var = s[4];` to assign it some tainted data):
+8. Secregrind can also retrieve the names (as they appear in the source code) of the variables that are tainted. This works for stack and global variables. It also makes Secretgrind much much slower, as it must look up the name of variables for each access to tainted memory. So use this option sparsely! Now update the code as follows (note the use of a new stack variable `stack_var` and `stack_var = s[4];` to assign it some tainted data):
 
 	```c
 	#include <stdlib.h>
@@ -403,7 +403,7 @@ Examples
 
 	The stack variable is no longer tainted. The compiler has optimized the binary somehow: for example, it may be keeping `stack_var` in a register rather than allocate it on the stack; or it may have removed `stack_var` entirely as this does not affect the program in a meaningful way. 
 
-10. Secretgrind can also display a live trace of what is executed with option **--trace=yes**. The output can be overwhelming, so if you are only interested in the taint, it is good practice to use the option **--trace-taint-only=yes**:
+9. Secretgrind can also display a live trace of what is executed with option **--trace=yes**. The output can be overwhelming, so if you are only interested in the taint, it is good practice to use the option **--trace-taint-only=yes**:
 
 		[me@machine ~/examples] gcc -Wall -O0 test.c -o test	# we want to see stack_var
 		[me@machine ~/examples] secretgrind --trace-taint-only=yes --trace=yes --var-name=yes --mnemonics=yes --summary-main-only=yes --summary-verbose=yes --file-filter=/home/me/examples/tainted.txt ./test tainted.txt
@@ -432,7 +432,7 @@ Examples
 
 	Details of VEX operators and IRStmts can be found in VEX/pub/libvex_ir.h . Secretgrind displays runtime values as they appear in memory: for example, on an LE platform the integer 4 will show as 0x04000000; on a BE platform it will show as 0x00000004. Here, `t14_9600` is an 8-bit integer `I8` loaded with value 0x2000000000000000. 0x20 is the space character ' ', which is indeed the 5th character of the string "This is a tainted file." contained in tainted.txt . The value loaded in `t14_9600` is "variable" `@0x51ec040_malloc_123_1`: data at memory address 0x51ec040, which is of type `malloc`, allocated by process with pid `123` and Valgrind thread ID `1`, ie `s[4]` in the source code.
 
-11. If you are only interested in the total number of bytes tainted, and not the summary, you can use **--summary-total-only=yes**; or you can disable the summary with **--summary=no**.
+10. If you are only interested in the total number of bytes tainted, and not the summary, you can use **--summary-total-only=yes**; or you can disable the summary with **--summary=no**.
 
 	
 Client requests
