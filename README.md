@@ -107,7 +107,7 @@ Examples
 --------
 1. Create a file containing tainted data:
 	
-		[me@machine ~/examples] echo "This is a tainted file" > tainted.txt
+		[me@machine ~/examples] echo "This is a tainted file." > tainted.txt
 
 2. Consider the following code (call it test.c):
 	```c
@@ -194,7 +194,7 @@ Examples
 		Total bytes tainted: 24
 		==123== 
 
-	By default, Secretgrind provides a short summary of each tainted memory region. In this run, the 24 bytes of `range [0x51ec040 - 0x51ec057]` are tainted (this may vary on your platform). It also indicates the "type" of the memory that is tainted, here `malloc` since the variable `char *s` was malloc()'ed. Other keywords you might see here are: `fmmap` for mapp()'ed files, `mmap` for non-file mapp()'ed memory regions, `stack`, `global`, and `other` for anything else.
+	By default, Secretgrind provides a short summary of each tainted memory region. In this run, the 24 bytes of `range [0x51ec040 - 0x51ec057]` are tainted (this is the number of characters read from the file tainted.txt). It also indicates the "type" of the memory that is tainted, here `malloc` since the variable `char *s` was malloc()'ed. Other keywords you might see here are: `fmmap` for mapp()'ed files, `mmap` for non-file mapp()'ed memory regions, `stack`, `global`, and `other` for anything else.
 
 6. To get more information about the taint, such as the stacktrace that led to it, or how the block was allocated (in the case of `malloc()`'ed and `mmap()`'ed regions), use option **--summary-verbose=yes**:
 
