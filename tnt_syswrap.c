@@ -528,6 +528,8 @@ void TNT_(syscall_open)(ThreadId tid, UWord* args, UInt nArgs, SysRes res) {
    Bool  verbose      = False;
 #endif
    
+   LOG_ENTER();
+   
    // check if we have already created a sandbox
    if (have_created_sandbox && !IN_SANDBOX) {
 #ifdef VGO_freebsd
@@ -562,6 +564,9 @@ void TNT_(syscall_open)(ThreadId tid, UWord* args, UInt nArgs, SysRes res) {
 #error OS unknown
 #endif
 
+		LOG("syscall open %d %s %lx %d\n", tid, fdpath, args[1], fd);
+		LOG("TNT_(file_filter_match)(fdpath): %d\n", TNT_(file_filter_match)(fdpath));
+
 		//LOG("fdpath:%s, filter:%s\n", fdpath, TNT_(clo_file_filter));
         if( TNT_(clo_taint_all) ){
 
@@ -570,8 +575,8 @@ void TNT_(syscall_open)(ThreadId tid, UWord* args, UInt nArgs, SysRes res) {
 #else
             tainted_fds[tid][fd] = True;
 #endif
-            if ( verbose )
-               VG_(printf)("syscall open %d %s %lx %d\n", tid, fdpath, args[1], fd);
+            //if ( verbose )
+            //   VG_(printf)("syscall open %d %s %lx %d\n", tid, fdpath, args[1], fd);
 #if _SECRETGRIND_
 			set_fd_read_offset( tid, fd, 0 );
 #else 
@@ -790,10 +795,10 @@ void TNT_(syscall_mmap)(ThreadId tid, UWord* args, UInt nArgs, SysRes res)
 	
 	//tl_assert ( nArgs == 6 );
 	Addr addr_ret  = sr_Res(res);	
-	//Addr addr = args[0];
+	Addr addr = args[0];
 	UInt length = args[1];
-	//int prot = args[2];
-	//int flags = args[3];
+	int prot = args[2];
+	int flags = args[3];
 	int fd = args[4];
 	SizeT offset = args[5];
 	
