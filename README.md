@@ -194,7 +194,7 @@ Examples
 		Total bytes tainted: 24
 		==123== 
 
-	By default, Secretgrind provides a short summary of each tainted memory region. In this run, the 24 bytes of `range [0x51ec040 - 0x51ec057]` are tainted. It also indicates the "type" of the memory that is tainted, here `malloc` since the variable `char *s` was malloc()'ed. Other keywords you might see here are: `fmmap` for mapp()'ed files, `mmap` for non-file mapp()'ed memory regions, `stack`, `global`, and `other` for anything else.
+	By default, Secretgrind provides a short summary of each tainted memory region. In this run, the 24 bytes of `range [0x51ec040 - 0x51ec057]` are tainted (this may vary on your platform). It also indicates the "type" of the memory that is tainted, here `malloc` since the variable `char *s` was malloc()'ed. Other keywords you might see here are: `fmmap` for mapp()'ed files, `mmap` for non-file mapp()'ed memory regions, `stack`, `global`, and `other` for anything else.
 
 6. To get more information about the taint, such as the stacktrace that led to it, or how the block was allocated (in the case of `malloc()`'ed and `mmap()`'ed regions), use option **--summary-verbose=yes**:
 
@@ -401,7 +401,7 @@ Examples
 		Total bytes tainted: 24
 		==123== 
 
-	The stack variable is no longer tainted. The compiler has optimized the binary somehow: for example, it may be keeping `stack_var` in a register rather than allocate it on the stack; or it may have removed `stack_var` entirely as this does not affect the program in a meaningful way. 
+	The stack variable is no longer tainted. The compiler has optimized the binary somehow: for example, it may be keeping `stack_var` in a register rather than on the stack; or it may have removed `stack_var` entirely as this does not affect the program in a "meaningful" way. 
 
 9. Secretgrind can also display a live trace of what is executed with option **--trace=yes**. The output can be overwhelming, so if you are only interested in the taint, it is good practice to use the option **--trace-taint-only=yes**:
 
@@ -425,12 +425,12 @@ Examples
 		---------------------------------------------------
 		[...]
 	
-	Secretgrind displays each instruction that are executed. The first that appears in the run is `0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:`. This shows both the raw instruction in hex `0f b6 40 04`, its mnemonics `movzbl 4(%rax), %eax`, and an instruction ID `_1cb40_`. This correponds to `stack_var = s[4];` in the source code. Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). This is why you see multiple lines of "execution"  for each instruction. As explained in [Taintgrind](https://github.com/wmkhoo/taintgrind), the output is a list of Valgrind IR (VEX) statements of the form:
+	Secretgrind displays each instruction that is executed. The first that appears in the run is `0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:`. This shows both the raw instruction in hex `0f b6 40 04`, its mnemonics `movzbl 4(%rax), %eax`, and an instruction ID `_1cb40_`. This correponds to `stack_var = s[4];` in the source code. Valgrind represents an instruction in [Single-Static-Assignment (SSA) form](https://en.wikipedia.org/wiki/Static_single_assignment_form). This is why you see multiple lines of "execution"  for each instruction. As explained in [Taintgrind](https://github.com/wmkhoo/taintgrind), the output is a list of Valgrind IR (VEX) statements of the form:
 
 		Address/Location 	| VEX-IRStmt 		  | Runtime value(s)   | Taint value(s) 	| Information flow
 		t14_9600 = 			  LOAD I8 t10_10371   | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
 
-	Details of VEX operators and IRStmts can be found in VEX/pub/libvex_ir.h . Secretgrind displays runtime values as they appear in memory: for example, on an LE platform the integer 4 will show as 0x04000000; on a BE platform it will show as 0x00000004. Here, `t14_9600` is an 8-bit integer `I8` loaded with value 0x2000000000000000. 0x20 is the space character ' ', which is indeed the 5th character of the string "This is a tainted file." contained in tainted.txt . The value loaded in `t14_9600` is "variable" `@0x51ec040_malloc_123_1`: data at memory address 0x51ec040, which is of type `malloc`, allocated by process with pid `123` and Valgrind thread ID `1`, ie `s[4]` in the source code.
+	Details of VEX operators and IRStmts can be found in VEX/pub/libvex_ir.h . Secretgrind displays runtime values as they appear in memory: for example, on an LE platform the integer 4 will show as 0x04000000; on a BE platform it will show as 0x00000004. Here, `t14_9600` is an 8-bit integer `I8` loaded with value 0x2000000000000000. 0x20 is the space character '  ', which is indeed the 5th character of the string "This is a tainted file." contained in tainted.txt . The value loaded in `t14_9600` is "variable" `@0x51ec040_malloc_123_1`: data at memory address 0x51ec040, which is of type `malloc`, allocated by process with pid `123` and Valgrind thread ID `1`, ie `s[4]` in the source code.
 
 10. If you are only interested in the total number of bytes tainted, and not the summary, you can use **--summary-total-only=yes**; or you can disable the summary with **--summary=no**.
 
@@ -529,7 +529,7 @@ Client requests
 		---------------------------------------------------
 
 		***(1) (malloc)	 range [0x51ec040 - 0x51ec057]	 (24 bytes)	 is tainted
-
+			[...]
 		Total bytes tainted: 24
 
 		==123== [TAINT STATE]: stack_var taint (1 bytes)
