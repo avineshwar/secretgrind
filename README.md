@@ -1,6 +1,9 @@
 Secretgrind: a Valgrind analysis tool to detect secrets in memory
 =================================================================
 
+Description:
+-----------
+
 Secretgrind is a runtime analysis tool that uses taint to track sensitive data in memory. It builds upon [Taintgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo. By default, Secretgrind propagates taint in two ways:
 
 1. In "direct flow", ie during assignments: if a tainted (ie sensitive) variable `tainted_var` is copied to another variable `other_var`, then `other_var` takes the taint of `tainted_var`:
