@@ -14,7 +14,7 @@ Secretgrind is a runtime analysis tool that uses taint to track sensitive data i
 	int other_var3 = tainted_var | non_tainted_var;	// other_var3 is now tainted
 	int other_var4 = tainted_var ^ non_tainted_var;	// other_var4 is now tainted
 	// More generally, any binary operation results in taint propagation
-	int other_varX = tainted_var __binOperation__ non_tainted_var	// other_varX is not tainted
+	int other_varX = tainted_var __binOperation__ non_tainted_var	// other_varX is now tainted
 	```
 
 2. In pointer arithmetic operations: think of this as a lookup table where the table is not sensitive but the index used for lookup is:
