@@ -1,8 +1,38 @@
 Secretgrind: a Valgrind analysis tool to detect secrets in memory
 =================================================================
 
-Secretgrind is based on [Taintgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
-Taintgrind is based on [Valgrind](http://valgrind/org)'s MemCheck and work by Will Drewry on [Flayer](http://code.google.com/p/flayer/).
+Secretgrind is a runtime analysis tool that uses taint to track sensitive data in memory. It builds upon [Taintgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo. By default, Secretgrind propagates taint in two ways:
+
+1. In "direct flow", ie during assignments: if a tainted (ie sensitive) variable `tainted_var` is copied to another variable `other_var`, then `other_var` takes the taint of `tainted_var`:
+
+	```c
+	int non_tainted_var = 0;
+	int tainted_var = 0;
+	[...] // code that copies sensitive data to tainted_var
+	int other_var = tainted_var;		// other_var is now tainted
+	int other_var2 = tainted_var & non_tainted_var;	// other_var2 is now tainted
+	int other_var3 = tainted_var | non_tainted_var;	// other_var3 is now tainted
+	int other_var4 = tainted_var ^ non_tainted_var;	// other_var4 is now tainted
+	// More generally, any binary operation results in taint propagation
+	int other_varX = tainted_var __binOperation__ non_tainted_var	// other_varX is not tainted
+	```
+
+2. In pointer arithmetic operations: think of this as a lookup table where the table is not sensitive but the index used for lookup is:
+	```c
+	void bin2hex(u8 const * in, size_t const ilen, char *out) {
+		char const *fmt = "0123456789ABCDEF";	// this table is not sensitive
+		size_t i = 0;
+
+		assert (in && out);
+		assert ((ilen&1) == 0);
+
+		for (i=0;i<ilen;++i) {
+			out[2*i]        = fmt[ (in[i] >> 4) & 0x0F ];	// out[2*i] becomes tainted if the index in[i] is sensitive
+			out[(2*i)+1]    = fmt[  in[i] & 0x0F       ];	// out[(2*i)+1] becomes tainted if the index in[i] is sensitive
+		}
+		out[2*i] = '\0';
+	}
+	```
 
 Warnings:
 ---------
@@ -410,16 +440,16 @@ Examples
 		[me@machine ~/examples] ...
 
 		==123== 0x400834: 0f b6 40 04: movzbl 4(%rax), %eax     ID _1cb40_:
-		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t14_9600 = LOAD I8 t10_10371 | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
-		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t29_5404 = 8Uto32 t14_9600 | 0x2000000000000000 | 0xff00000000000000 | t29_5404 <- t14_9600
-		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t13_11966 = t29_5404 | 0x2000000000000000 | 0xff00000000000000 | t13_11966 <- t29_5404
-		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t30_6184 = 32Uto64 t13_11966 | 0x2000000000000000 | 0xff00000000000000 | t30_6184 <- t13_11966
-		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t12_11569 = t30_6184 | 0x2000000000000000 | 0xff00000000000000 | t12_11569 <- t30_6184
-		==123== 0x400834: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | r16_1 = t12_11569 | 0x2000000000000000 | 0xff00000000000000 | r16_1 <- t12_11569
+		==123== 0x400834: main (in /home/me/examples/test) | t14_9600 = LOAD I8 t10_10371 | 0x2000000000000000 | 0xff00000000000000 | t14_9600 <- @0x51ec040_malloc_123_1
+		==123== 0x400834: main (in /home/me/examples/test) | t29_5404 = 8Uto32 t14_9600 | 0x2000000000000000 | 0xff00000000000000 | t29_5404 <- t14_9600
+		==123== 0x400834: main (in /home/me/examples/test) | t13_11966 = t29_5404 | 0x2000000000000000 | 0xff00000000000000 | t13_11966 <- t29_5404
+		==123== 0x400834: main (in /home/me/examples/test) | t30_6184 = 32Uto64 t13_11966 | 0x2000000000000000 | 0xff00000000000000 | t30_6184 <- t13_11966
+		==123== 0x400834: main (in /home/me/examples/test) | t12_11569 = t30_6184 | 0x2000000000000000 | 0xff00000000000000 | t12_11569 <- t30_6184
+		==123== 0x400834: main (in /home/me/examples/test) | r16_1 = t12_11569 | 0x2000000000000000 | 0xff00000000000000 | r16_1 <- t12_11569
 
 		==123== 0x400838: 88 45 db: movb %al, -0x25(%rbp)     ID _1cb41_:
-		==123== 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | t17_9609 = r16_1 I8 | 0x2000000000000000 | 0xff00000000000000 | t17_9609 <- r16_1
-		==123== 0x400838: main (in /auto/homes/lmrs2/zero_mem/VALGRIND/tests/test1) | STORE t15_10583 = t17_9609 | 0x2000000000000000 | 0xff00000000000000 | obj_test1@0xffefffb4b_unknownvar_123_1 <- t17_9609
+		==123== 0x400838: main (in /home/me/examples/test) | t17_9609 = r16_1 I8 | 0x2000000000000000 | 0xff00000000000000 | t17_9609 <- r16_1
+		==123== 0x400838: main (in /home/me/examples/test) | STORE t15_10583 = t17_9609 | 0x2000000000000000 | 0xff00000000000000 | obj_test1@0xffefffb4b_unknownvar_123_1 <- t17_9609
 
 		==123== [TAINT SUMMARY] - On end main():
 		---------------------------------------------------
@@ -562,5 +592,5 @@ Client requests
 
 Notes
 -----
-Secretgrind is based on [Valgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
+Secretgrind is based on [Taintgrind](https://github.com/wmkhoo/taintgrind) by Wei Ming Khoo.
 Taintgrind is based on [Valgrind](http://valgrind/org)'s MemCheck and work by Will Drewry on [Flayer](http://code.google.com/p/flayer/).
